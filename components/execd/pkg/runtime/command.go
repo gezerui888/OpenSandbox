@@ -339,11 +339,11 @@ func (c *Controller) runCommand(ctx context.Context, request *ExecuteCodeRequest
 		}
 	})
 
-	var waitErr error
+	waitErr := errors.New("command wait did not complete")
 	safego.Go(func() {
+		defer close(done)
 		// Observe exit independently of blocked init or output callbacks.
 		waitErr = mp.Wait()
-		close(done)
 	})
 
 	request.Hooks.OnExecuteInit(session)
